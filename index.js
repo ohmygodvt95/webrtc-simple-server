@@ -2,12 +2,12 @@ var app = require('express')();
 var cors = require('cors');
 var server = require('http').Server(app);
 var io = require('socket.io')(server, { origins: '*:*' });
-
+const PORT = process.env.PORT || 3000
 app.use(cors())
 
 var room = {};
 
-server.listen(3000);
+server.listen(PORT);
 // WARNING: app.listen(80) will NOT work here!
 
 app.get('/', function(req, res) {
