@@ -1,6 +1,10 @@
 var app = require('express')();
+var cors = require('cors');
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+
+app.use(cors())
+
 var room = {};
 
 server.listen(3000);
@@ -12,28 +16,47 @@ app.get('/', function(req, res) {
 
 io.on('connection', function(socket) {
     console.log(socket.id + ' had connected')
+    console.log(room)
 
     socket.on('message', data => {
         data = JSON.parse(data)
         if (!room[data.room]) {
             room[data.room] = [socket.id]
-        } else {
+        } else if (room[data.room].length < 2) {
             if (room[data.room].filter(i => i === socket.id).length === 0) {
                 room[data.room].push(socket.id)
             }
         }
-
-        for (s of room[data.room]) {
-            if (s !== socket.id && io.sockets.sockets[s]) {
-                io.sockets.sockets[s].emit('message', data.data)
+        if (room[data.room].length === 2) {
+            for (s of room[data.room]) {
+                if (s !== socket.id && io.sockets.sockets[s] && room[data.room].length <= 2) {
+                    io.sockets.sockets[s].emit('message', data.data)
+                }
             }
         }
     })
 
     socket.on('join', (roomId) => {
+        console.log('join' + roomId)
         if (room[roomId] && room[roomId].length === 2) {
             socket.emit('reject', { error: 'Room is full' })
         }
+    })
+
+    socket.on('leave', (roomId) => {
+        console.log('leave' + roomId)
+        for (s in room) {
+            for (let i = 0; i < room[s].length; i++) {
+                if (room[s][i] === roomId) {
+                    room[s].splice(i, 1)
+                    if (room[s].length == 0) {
+                        delete room[s]
+                    }
+                    break
+                }
+            }
+        }
+        console.log(room)
     })
 
     socket.on('disconnect', () => {
