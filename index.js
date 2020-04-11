@@ -1,7 +1,7 @@
 var app = require('express')();
 var cors = require('cors');
 var server = require('http').Server(app);
-var io = require('socket.io')(server);
+var io = require('socket.io')(server, { origins: '*:*' });
 
 app.use(cors())
 
