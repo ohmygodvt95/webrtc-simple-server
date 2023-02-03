@@ -2,7 +2,7 @@ var app = require('express')();
 var cors = require('cors');
 var server = require('http').Server(app);
 var io = require('socket.io')(server, { origins: '*:*' });
-const PORT = process.env.PORT || 3000
+const PORT = 80
 app.use(cors())
 
 var room = {};
