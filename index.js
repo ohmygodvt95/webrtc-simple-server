@@ -2,14 +2,14 @@ var app = require('express')();
 var cors = require('cors');
 var server = require('http').Server(app);
 var io = require('socket.io')(server, { origins: '*:*' });
-const PORT = 80
+const PORT = process.env.PORT || 3000
 app.use(cors())
 
 var room = {};
 
 server.listen(PORT);
 // WARNING: app.listen(80) will NOT work here!
-
+console.log(`Web listen on PORT=${PORT}`);
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });
